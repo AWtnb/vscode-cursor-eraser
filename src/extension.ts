@@ -57,12 +57,12 @@ const caseSensitive: boolean = config.get("caseSensitive") || false;
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand("cursor-eraser.erase-toBegin", (editor: vscode.TextEditor) => {
-      eraseVertical(editor, true);
+      eraseVertical(editor, false);
     })
   );
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand("cursor-eraser.erase-toEnd", (editor: vscode.TextEditor) => {
-      eraseVertical(editor, false);
+      eraseVertical(editor, true);
     })
   );
   context.subscriptions.push(
