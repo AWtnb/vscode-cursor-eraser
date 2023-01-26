@@ -1,6 +1,10 @@
 {
   "name": "cursor-eraser",
   "publisher": "awtnb",
+  "repository": {
+    "url": "https://github.com/AWtnb/vscode-cursor-eraser"
+  },
+  "icon": "images/logo.png",
   "displayName": "cursor-eraser",
   "description": "Erase unnecessary cursors in multi-cursor mode.",
   "version": "0.0.1",
