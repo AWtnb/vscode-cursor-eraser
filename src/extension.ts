@@ -37,7 +37,7 @@ const eraseByRegExp = (editor: vscode.TextEditor, caseSensitive: boolean = true,
       }
       const opt = caseSensitive ? "" : "i";
       const reg = new RegExp(query, opt);
-      editor.selections = editor.selections.filter((sel) => {
+      const newSels = editor.selections.filter((sel) => {
         const line = editor.document.lineAt(sel.active).text;
         const isMatch = reg.test(line);
         if (keepMatch) {
@@ -45,6 +45,12 @@ const eraseByRegExp = (editor: vscode.TextEditor, caseSensitive: boolean = true,
         }
         return !isMatch;
       });
+      if (newSels.length){
+        editor.selections = newSels;
+      }
+      else {
+        vscode.window.showErrorMessage("cursor-eraser: no match line.");
+      }
     });
   Promise.resolve(filterProcess).catch((reason) => {
     vscode.window.showErrorMessage("cursor-eraser: " + reason.message);
