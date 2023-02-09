@@ -8,7 +8,7 @@ const eraseVertical = (editor: vscode.TextEditor, upward: boolean = true) => {
   // index 0 of Selections seems to be the position just before starting multi-cursor-mode.
   const origin = editor.selections[0];
 
-  editor.selections = editor.selections.filter((sel) => {
+  const newSels = editor.selections.filter((sel) => {
     if (upward) {
       if (sel.end.line == origin.end.line) {
         return sel.end.character <= origin.end.character;
@@ -20,6 +20,9 @@ const eraseVertical = (editor: vscode.TextEditor, upward: boolean = true) => {
     }
     return origin.start.line < sel.start.line;
   });
+  if (newSels.length) {
+    editor.selections = newSels;
+  }
 };
 
 const eraseByRegExp = (editor: vscode.TextEditor, caseSensitive: boolean = true, keepMatch: boolean = true) => {
@@ -45,10 +48,9 @@ const eraseByRegExp = (editor: vscode.TextEditor, caseSensitive: boolean = true,
         }
         return !isMatch;
       });
-      if (newSels.length){
+      if (newSels.length) {
         editor.selections = newSels;
-      }
-      else {
+      } else {
         vscode.window.showErrorMessage("cursor-eraser: no match line.");
       }
     });
