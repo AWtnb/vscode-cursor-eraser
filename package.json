@@ -7,7 +7,7 @@
   "icon": "images/logo.png",
   "displayName": "cursor-eraser",
   "description": "Erase unnecessary cursors in multi-cursor mode.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "engines": {
     "vscode": "^1.74.0"
   },
