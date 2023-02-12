@@ -59,9 +59,6 @@ const eraseByRegExp = (editor: vscode.TextEditor, caseSensitive: boolean = true,
   });
 };
 
-const config = vscode.workspace.getConfiguration("cursor-eraser");
-const caseSensitive: boolean = config.get("caseSensitive") || false;
-
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand("cursor-eraser.erase-toBegin", (editor: vscode.TextEditor) => {
@@ -73,6 +70,9 @@ export function activate(context: vscode.ExtensionContext) {
       eraseVertical(editor, true);
     })
   );
+
+  const config = vscode.workspace.getConfiguration("cursor-eraser");
+  const caseSensitive: boolean = config.get("caseSensitive") || false;
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand("cursor-eraser.keep-match", (editor: vscode.TextEditor) => {
       eraseByRegExp(editor, caseSensitive, true);
