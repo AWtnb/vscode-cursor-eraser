@@ -14,6 +14,9 @@
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "Multi-cursor"
+  ],
   "activationEvents": [
     "onCommand:cursor-eraser.erase-toBegin",
     "onCommand:cursor-eraser.erase-toEnd",
