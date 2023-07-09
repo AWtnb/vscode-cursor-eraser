@@ -25,39 +25,60 @@ const eraseVertical = (editor: vscode.TextEditor, upward: boolean = true) => {
   }
 };
 
-const eraseByRegExp = (editor: vscode.TextEditor, caseSensitive: boolean = true, keepMatch: boolean = true) => {
-  if (editor.selections.length < 2) {
-    return;
+class RegExpCursorEraser {
+  readonly editor: vscode.TextEditor;
+  readonly caseSensitive: boolean;
+  readonly keepMatch: boolean;
+
+  constructor(editor: vscode.TextEditor, caseSensitive: boolean = true, keepMatch: boolean = true) {
+    this.editor = editor;
+    this.caseSensitive = caseSensitive;
+    this.keepMatch = keepMatch;
   }
-  const filterProcess = vscode.window
-    .showInputBox({
-      title: caseSensitive ? "cursor-eraser (case-sensitive)" : "cursor-eraser (ignore-case)",
-      prompt: keepMatch ? "KEEP cursor by regexp (cursors on non-matched line will be erased)." : "ERASE cursor by regexp.",
-    })
-    .then((query: string | undefined) => {
-      if (!query) {
-        return;
+
+  private erase(pattern: string) {
+    const opt = this.caseSensitive ? "" : "i";
+    const reg = new RegExp(pattern, opt);
+    const newSels = this.editor.selections.filter((sel) => {
+      const line = this.editor.document.lineAt(sel.active).text;
+      const isMatch = reg.test(line);
+      if (this.keepMatch) {
+        return isMatch;
       }
-      const opt = caseSensitive ? "" : "i";
-      const reg = new RegExp(query, opt);
-      const newSels = editor.selections.filter((sel) => {
-        const line = editor.document.lineAt(sel.active).text;
-        const isMatch = reg.test(line);
-        if (keepMatch) {
-          return isMatch;
-        }
-        return !isMatch;
-      });
-      if (newSels.length) {
-        editor.selections = newSels;
-      } else {
-        vscode.window.showErrorMessage("cursor-eraser: no match line.");
-      }
+      return !isMatch;
     });
-  Promise.resolve(filterProcess).catch((reason) => {
-    vscode.window.showErrorMessage("cursor-eraser: " + reason.message);
-  });
-};
+    if (newSels.length) {
+      this.editor.selections = newSels;
+    } else {
+      vscode.window.showErrorMessage("cursor-eraser: no match line.");
+    }
+  }
+
+  execute(pattern: string) {
+    if (this.editor.selections.length < 2) {
+      return;
+    }
+    if (pattern.length) {
+      this.erase(pattern);
+      return;
+    }
+
+    const eraseProcess = vscode.window
+      .showInputBox({
+        title: this.caseSensitive ? "cursor-eraser (case-sensitive)" : "cursor-eraser (ignore-case)",
+        prompt: this.keepMatch ? "KEEP cursor by regexp (cursors on non-matched line will be erased)." : "ERASE cursor by regexp.",
+      })
+      .then((pattern: string | undefined) => {
+        if (!pattern) {
+          return;
+        }
+        this.erase(pattern);
+      });
+    Promise.resolve(eraseProcess).catch((reason) => {
+      vscode.window.showErrorMessage("cursor-eraser: " + reason.message);
+    });
+  }
+}
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -74,13 +95,15 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("cursor-eraser");
   const caseSensitive: boolean = config.get("caseSensitive") || false;
   context.subscriptions.push(
-    vscode.commands.registerTextEditorCommand("cursor-eraser.keep-match", (editor: vscode.TextEditor) => {
-      eraseByRegExp(editor, caseSensitive, true);
+    vscode.commands.registerTextEditorCommand("cursor-eraser.keep-match", (editor: vscode.TextEditor, _edit: vscode.TextEditorEdit, pattern: string = "") => {
+      const eraser = new RegExpCursorEraser(editor, caseSensitive, true);
+      eraser.execute(pattern);
     })
   );
   context.subscriptions.push(
-    vscode.commands.registerTextEditorCommand("cursor-eraser.erase-match", (editor: vscode.TextEditor) => {
-      eraseByRegExp(editor, caseSensitive, false);
+    vscode.commands.registerTextEditorCommand("cursor-eraser.erase-match", (editor: vscode.TextEditor, _edit: vscode.TextEditorEdit, pattern: string = "") => {
+      const eraser = new RegExpCursorEraser(editor, caseSensitive, false);
+      eraser.execute(pattern);
     })
   );
 }
