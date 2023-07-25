@@ -28,19 +28,23 @@
     "commands": [
       {
         "command": "cursor-eraser.erase-toBegin",
-        "title": "cursor-eraser: erase to BEGIN of file"
+        "title": "erase to BEGIN of file",
+        "category": "cursor-eraser"
       },
       {
         "command": "cursor-eraser.erase-toEnd",
-        "title": "cursor-eraser: erase to END of file"
+        "title": "erase to END of file",
+        "category": "cursor-eraser"
       },
       {
         "command": "cursor-eraser.keep-match",
-        "title": "cursor-eraser: KEEP match"
+        "title": "KEEP match",
+        "category": "cursor-eraser"
       },
       {
         "command": "cursor-eraser.erase-match",
-        "title": "cursor-eraser: ERASE match"
+        "title": "ERASE match",
+        "category": "cursor-eraser"
       }
     ],
     "configuration": {
